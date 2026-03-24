@@ -2,33 +2,21 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import time
+import click
 import math
 
 class MyAnimate:
     
     plt.rcParams['animation.embed_limit'] = 300
 
-    n = 200
-    d = 0.01
-    v = 0.01
-    dt = 1
-    eta = 0.1
+    n = None
+    d = None
+    v = None
+    dt = None
+    eta = None
 
-    r = np.random.random((n, 2))
-    theta = np.random.random(n)
-
-    fig, ax = plt.subplots(figsize=(6, 6))
-
-    x = r[:, 0]
-    y = r[:, 1]
-    u = np.cos(2 * np.pi * theta)
-    vv = np.sin(2 * np.pi * theta)
-
-    q = ax.quiver(x, y, u, vv, angles='xy')
-    ax.set_xlim(0, 1)
-    ax.set_ylim(0, 1)
-    ax.set_title("Vicsek Model")
-
+    r = None
+    theta = None
     counter = 0
 
 
@@ -95,7 +83,41 @@ def animate(frame):
 
     return MyAnimate.q,
 
-if __name__ == "__main__":
+@click.command()
+@click.option("--n", default=200)
+@click.option("--d", default=0.01)
+@click.option("--v", default=0.01)
+@click.option("--dt", default=1)
+@click.option("--eta", default=0.1)
+def main(n, d, v, dt, eta):
+
+    # Parameter setzen
+    MyAnimate.n = n
+    MyAnimate.d = d
+    MyAnimate.v = v
+    MyAnimate.dt = dt
+    MyAnimate.eta = eta
+
+    MyAnimate.r = np.random.random((MyAnimate.n, 2))
+    MyAnimate.theta = np.random.random(MyAnimate.n)
+
+    MyAnimate.fig, MyAnimate.ax = plt.subplots(figsize=(6, 6))
+
+    MyAnimate.q = MyAnimate.ax.quiver(
+        MyAnimate.r[:, 0],
+        MyAnimate.r[:, 1],
+        np.cos(2 * np.pi * MyAnimate.theta),
+        np.sin(2 * np.pi * MyAnimate.theta),
+        angles='xy'
+    )
+
+    MyAnimate.ax.set_xlim(0, 1)
+    MyAnimate.ax.set_ylim(0, 1)
+    MyAnimate.ax.set_title("Vicsek Model")
 
     ani = FuncAnimation(MyAnimate.fig, animate, frames=200, interval=50, blit=True)
     plt.show()
+
+
+if __name__ == "__main__":
+    main()
