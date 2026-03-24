@@ -1,0 +1,11 @@
+Metadata-Version: 2.4
+Name: first_package
+Version: 0.1.0
+Summary: A simple Python package
+Author: Niklas Chromik
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy
+Requires-Dist: pandas
+Dynamic: license-file
