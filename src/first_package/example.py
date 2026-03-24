@@ -6,7 +6,21 @@ import math
 
 plt.rcParams['animation.embed_limit'] = 300
 
-n = 200
+####
+class VicsekModel:
+    def __init__(self, n=200, d=0.01, v=0.01, dt=1, eta=0.1):
+        self.n = n
+        self.d = d
+        self.v = v
+        self.dt = dt
+        self.eta = eta
+
+        self.r = np.random.random((n, 2))  # positions
+        self.theta = np.random.random(n)   # directions
+
+####
+
+n = 10
 d = 0.01
 v = 0.01
 dt = 1
