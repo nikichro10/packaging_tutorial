@@ -12,6 +12,5 @@ dependencies = [
     "numpy",
     "pandas", 
     "pytest", 
-    "click", 
-    "loggin"
+    "click"
 ]
