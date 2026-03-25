@@ -6,87 +6,78 @@ import click
 import math
 import logging
 import pdb
-
 logging.basicConfig(filename="app.log", level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 
 class MyAnimate:
+
+    def __init__(self, n=200):
+        self.n = n
+        self.r = np.random.random((self.n, 2))
+        self.theta = np.random.random(self.n)
+        self.counter = 0
+
+    
+    @staticmethod
+    def distance(p1, p2):
+        return np.sqrt(((p1 - p2) ** 2).sum())
     
     plt.rcParams['animation.embed_limit'] = 300
 
-    n = None
-    d = None
-    v = None
-    dt = None
-    eta = None
 
-    r = None
-    theta = None
-    counter = 0
+    def update_model(self, d = 0.01, v=0.01, dt=1, eta=0.1):
 
+        for i in range(self.n):
+            sum_sin = 0
+            sum_cos = 0
+            neighbours = 0
 
-def distance(p1, p2):
-    return np.sqrt(((p1 - p2) ** 2).sum())
+            for j in range(self.n):
+                if i != j:
+                    if MyAnimate.distance(self.r[i], self.r[j]) < d:
+                        theta_j = 2 * np.pi * self.theta[j]
+                        sum_sin = sum_sin + np.sin(theta_j)
+                        sum_cos = sum_cos + np.cos(theta_j)
+                        neighbours = neighbours + 1
 
+            if neighbours > 0:
+                avg_theta = np.arctan2(sum_sin / neighbours, sum_cos / neighbours)
+                self.theta[i] = (avg_theta / (2 * np.pi)) + eta * (np.random.rand() - 0.5)
 
-def update_model():
-    
-    for i in range(MyAnimate.n):
-        sum_sin = 0
-        sum_cos = 0
-        neighbours = 0
+            dx = v * dt * np.cos(2 * np.pi * self.theta[i])
+            dy = v * dt * np.sin(2 * np.pi * self.theta[i])
 
-        for j in range(MyAnimate.n):
-            if i != j:
-                if distance(MyAnimate.r[i], MyAnimate.r[j]) < MyAnimate.d:
-                    theta_j = 2 * np.pi * MyAnimate.theta[j]
-                    sum_sin = sum_sin + np.sin(theta_j)
-                    sum_cos = sum_cos + np.cos(theta_j)
-                    neighbours = neighbours + 1
+            self.r[i, 0] = self.r[i, 0] + dx
+            self.r[i, 1] = self.r[i, 1] + dy
 
-        if neighbours > 0:
-            avg_theta = np.arctan2(sum_sin / neighbours, sum_cos / neighbours)
-            MyAnimate.theta[i] = (avg_theta / (2 * np.pi)) + MyAnimate.eta * (np.random.rand() - 0.5)
+            if self.r[i, 0] > 1:
+                self.r[i, 0] = 0
+            if self.r[i, 1] > 1:
+                self.r[i, 1] = 0
+            if self.r[i, 0] < 0:
+                self.r[i, 0] = 1
+            if self.r[i, 1] < 0:
+                self.r[i, 1] = 1
 
-        dx = MyAnimate.v * MyAnimate.dt * np.cos(2 * np.pi * MyAnimate.theta[i])
-        dy = MyAnimate.v * MyAnimate.dt * np.sin(2 * np.pi * MyAnimate.theta[i])
-
-        MyAnimate.r[i, 0] = MyAnimate.r[i, 0] + dx
-        MyAnimate.r[i, 1] = MyAnimate.r[i, 1] + dy
-
-        if MyAnimate.r[i, 0] > 1:
-            MyAnimate.r[i, 0] = 0
-        if MyAnimate.r[i, 1] > 1:
-            MyAnimate.r[i, 1] = 0
-        if MyAnimate.r[i, 0] < 0:
-            MyAnimate.r[i, 0] = 1
-        if MyAnimate.r[i, 1] < 0:
-            MyAnimate.r[i, 1] = 1
-
-        MyAnimate.counter = MyAnimate.counter + 1
+            self.counter = self.counter + 1
 
 
-def animate(frame):
-
-    update_model()
-
+def animate(frame, model, q):
+    model.update_model()
     x = []
     y = []
     u = []
     vv = []
+    for i in range(model.n):
+        x.append(model.r[i, 0])
+        y.append(model.r[i, 1])
+        u.append(np.cos(2 * np.pi * model.theta[i]))
+        vv.append(np.sin(2 * np.pi * model.theta[i]))
+    q.set_offsets(np.c_[x, y])
 
-    for i in range(MyAnimate.n):
-        x.append(MyAnimate.r[i, 0])
-        y.append(MyAnimate.r[i, 1])
-        u.append(np.cos(2 * np.pi * MyAnimate.theta[i]))
-        vv.append(np.sin(2 * np.pi * MyAnimate.theta[i]))
-
-    MyAnimate.q.set_offsets(np.c_[x, y])
-    MyAnimate.q.set_UVC(u, vv)
-
-    logging.info("frame: %d, counter: %d", frame, MyAnimate.counter)
-
-    return MyAnimate.q,
+    q.set_UVC(u, vv)
+    #logging.info("frame: %d, counter: %d", frame, model.counter)
+    return q,
 
 @click.command()
 @click.option("--n", default=200)
@@ -96,33 +87,19 @@ def animate(frame):
 @click.option("--eta", default=0.1)
 def main(n, d, v, dt, eta):
 
-    # Parameter setzen
-    MyAnimate.n = n
-    MyAnimate.d = d
-    MyAnimate.v = v
-    MyAnimate.dt = dt
-    MyAnimate.eta = eta
-    #pdb.set_trace()
-    #breakpoint()
+    fig, ax = plt.subplots(figsize=(6, 6))
+    vicsek = MyAnimate(n)
 
-    MyAnimate.r = np.random.random((MyAnimate.n, 2))
-    MyAnimate.theta = np.random.random(MyAnimate.n)
+    x = vicsek.r[:, 0]
+    y = vicsek.r[:, 1]
+    u = np.cos(2 * np.pi * vicsek.theta)
+    vv = np.sin(2 * np.pi * vicsek.theta)
+    q = ax.quiver(x, y, u, vv, angles='xy')
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.set_title("Vicsek Model")
 
-    MyAnimate.fig, MyAnimate.ax = plt.subplots(figsize=(6, 6))
-
-    MyAnimate.q = MyAnimate.ax.quiver(
-        MyAnimate.r[:, 0],
-        MyAnimate.r[:, 1],
-        np.cos(2 * np.pi * MyAnimate.theta),
-        np.sin(2 * np.pi * MyAnimate.theta),
-        angles='xy'
-    )
-
-    MyAnimate.ax.set_xlim(0, 1)
-    MyAnimate.ax.set_ylim(0, 1)
-    MyAnimate.ax.set_title("Vicsek Model")
-
-    ani = FuncAnimation(MyAnimate.fig, animate, frames=200, interval=50, blit=True)
+    ani = FuncAnimation(fig, animate, fargs=(vicsek, q), frames=200, interval=50, blit=True)
     plt.show()
 
 
