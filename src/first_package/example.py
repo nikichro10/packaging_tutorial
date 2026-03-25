@@ -34,6 +34,15 @@ class MyAnimate:
 
 
     def update_model(self, d = 0.01, v=0.01, dt=1, eta=0.1):
+        """
+        Updates the positions and orientations of the agents in the Vicsek model based on their interactions with neighboring agents.
+        Parameters:
+        d (float): The distance threshold for determining neighboring agents. Agents within this distance are considered neighbors.
+        v (float): The speed at which the agents move.
+        dt (float): The time step for updating the positions and orientations of the agents.
+        eta (float): The noise factor that adds randomness to the orientation updates of the agents.
+        The function iterates through each agent and calculates the average orientation of its neighbors within the specified distance. It then updates the orientation of the agent based on this average and adds some random noise. Finally, it updates the position of the agent based on its new orientation and ensures that the positions remain within the bounds of [0, 1].
+        """
 
         for i in range(self.n):
             sum_sin = 0
