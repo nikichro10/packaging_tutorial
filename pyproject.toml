@@ -13,5 +13,6 @@ dependencies = [
     "pandas", 
     "pytest", 
     "click", 
-    "matplotlib"
+    "matplotlib", 
+    "pdoc"
 ]
