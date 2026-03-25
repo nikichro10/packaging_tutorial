@@ -4,6 +4,11 @@ from matplotlib.animation import FuncAnimation
 import time
 import click
 import math
+import logging
+import pdb
+
+logging.basicConfig(filename="app.log", level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
 
 class MyAnimate:
     
@@ -79,7 +84,7 @@ def animate(frame):
     MyAnimate.q.set_offsets(np.c_[x, y])
     MyAnimate.q.set_UVC(u, vv)
 
-    print("frame", frame, "counter", MyAnimate.counter)
+    logging.info("frame: %d, counter: %d", frame, MyAnimate.counter)
 
     return MyAnimate.q,
 
@@ -97,6 +102,8 @@ def main(n, d, v, dt, eta):
     MyAnimate.v = v
     MyAnimate.dt = dt
     MyAnimate.eta = eta
+    #pdb.set_trace()
+    #breakpoint()
 
     MyAnimate.r = np.random.random((MyAnimate.n, 2))
     MyAnimate.theta = np.random.random(MyAnimate.n)
