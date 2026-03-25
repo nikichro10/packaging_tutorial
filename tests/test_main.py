@@ -1,5 +1,5 @@
 import pytest
-from first_package.example import MyAnimate
+from  packaging_tutorial.src.first_package.example import MyAnimate
 
 @pytest.fixture
 def example():
@@ -16,6 +16,8 @@ def test_distance():
     assert MyAnimate.distance(p2, p1) == MyAnimate.distance(p1, p2)
     assert MyAnimate.distance(p2, p1).shape == (1,)
     assert MyAnimate.distance(p2, p2) == 0
+
+
 
 
 
