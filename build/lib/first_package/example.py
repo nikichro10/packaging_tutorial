@@ -20,15 +20,7 @@ class MyAnimate:
     
     @staticmethod
     def distance(p1, p2):
-        """
-        Calculates the Euclidean distance between two points p1 and p2 in 2D space.
-        Parameters:
-        p1 (array-like): The first point, represented as a 2D array or list with two elements (x1, y1).
-        p2 (array-like): The second point, represented as a 2D array or list with two elements (x2, y2).
-        Returns:
-        float: The Euclidean distance between points p1 and p2.
-        """
-        return np.sqrt(((p1 - p2) ** 2).sum()) 
+        return np.sqrt(((p1 - p2) ** 2).sum())
     
     plt.rcParams['animation.embed_limit'] = 300
 
